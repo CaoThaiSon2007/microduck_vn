@@ -85,7 +85,7 @@ python <đường dẫn repo>/scripts/dynamic_load.py scene_walk.xml --gait my_g
 * Bị đẩy ngang (push recovery).
 * Ngã rồi tự đứng dậy, nếu robot cần làm việc này.
 
-> **Khớp mỏ:** MJCF đi bộ của XGO không có khớp mỏ, vì mỏ được điều khiển riêng qua console, không qua policy (§1.3). Vì vậy các kịch bản trên **không cho tải của servo mỏ**. Tính tải mỏ riêng: lấy mô-men tĩnh của hàm (khối lượng × cánh tay đòn CoM tới trục, $\tau = m g d$ ở góc xấu nhất), cộng với tải của thao tác cần làm, ví dụ ngậm hoặc kẹp vật.
+> **Khớp mỏ:** MJCF đi bộ của XGO không có khớp mỏ, vì mỏ được điều khiển riêng qua console, không qua policy (§1.4). Vì vậy các kịch bản trên **không cho tải của servo mỏ**. Tính tải mỏ riêng: lấy mô-men tĩnh của hàm (khối lượng × cánh tay đòn CoM tới trục, $\tau = m g d$ ở góc xấu nhất), cộng với tải của thao tác cần làm, ví dụ ngậm hoặc kẹp vật.
 
 **Chỉ số và cách so:**
 

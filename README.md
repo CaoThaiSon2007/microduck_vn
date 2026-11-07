@@ -60,7 +60,7 @@ Phase 1 (CAD) → Phase 2 (tải) ─ trượt → đổi ứng viên / sửa h�
 * Vòng PD bám góc chạy bên dưới policy:
   * Với HD1910, vòng này nằm trong firmware servo (XGO đặt KP 6 / KD 20).
   * Với servo độ (A, A′, B), vòng này do MCU tự chạy. Mục tiêu $500\text{ Hz} - 1\text{ kHz}$ (Compliant PD Control).
-* Tên khớp trong sơ đồ 5.1 là tên quy ước của tài liệu. Trong MJCF của XGO, khớp có tên `left_hip_yaw`, `left_knee`, `left_ankle`, `neck_pitch`… (xem §1.3).
+* Tên khớp trong sơ đồ 5.1 là tên quy ước của tài liệu. Trong MJCF của XGO, khớp có tên `left_hip_yaw`, `left_knee`, `left_ankle`, `neck_pitch`… (xem §1.4).
 * Hai con số này là yêu cầu đầu vào cho Phase 3 (servo phải cho phép làm được) và Phase 5 (sim phải chạy đúng tần số này).
 
 ## 6. Nguồn tham khảo
@@ -85,11 +85,11 @@ Phase 1 (CAD) → Phase 2 (tải) ─ trượt → đổi ứng viên / sửa h�
 
 | Nguồn | Dùng cho | Trạng thái |
 |---|---|---|
-| [LuwuDynamics/xgoduck_hardware](https://github.com/LuwuDynamics/xgoduck_hardware) | Cơ khí và điện tử. ⚠️ Cơ khí **chỉ có file STL** (thư mục `structure/`), không có CAD tham số (§1.2) | Đã đọc |
-| [xgoduck_hardware — docs/BOM.md](https://github.com/LuwuDynamics/xgoduck_hardware/blob/master/docs/BOM.md) | BOM, **bảng thông số HD-1910-C001** của nhà sản xuất, gain KP/KD runtime | Đã đọc |
+| [LuwuDynamics/xgoduck_hardware](https://github.com/LuwuDynamics/xgoduck_hardware) | Cơ khí và điện tử. ⚠️ Cơ khí **chỉ có file STL** (thư mục `structure/`), không có CAD tham số (§1.0) | Đã đọc |
+| [xgoduck_hardware — docs/BOM.md](https://github.com/LuwuDynamics/xgoduck_hardware/blob/master/docs/BOM.md) | BOM, **bảng thông số HD-1910-C001** của nhà sản xuất, gain KP/KD runtime, danh sách vòng bi và ốc vít (§1.2) | Đã đọc |
 | [xgoduck_hardware — UPSTREAM.md](https://github.com/LuwuDynamics/xgoduck_hardware/blob/master/UPSTREAM.md) | XGO-Duck kế thừa những gì từ Microduck; lưu ý giấy phép mô hình 3D | Đã đọc |
 | [LuwuDynamics/xgoduck_runtime_arduino](https://github.com/LuwuDynamics/xgoduck_runtime_arduino) | Runtime/firmware trên Arduino UNO Q | Link xác nhận tồn tại |
-| [LuwuDynamics/xgoduck_rl](https://github.com/LuwuDynamics/xgoduck_rl) | Nhánh RL từ microduck_rl. Có **MJCF/URDF XGO-Duck** (`src/mjlab_microduck/robot/xgoduck/`), khối lượng xuất từ SolidWorks, mô hình BAM `1910_m6.json` (§1.3, §2.2, §5.1) | Đã đọc README và các file mô hình |
+| [LuwuDynamics/xgoduck_rl](https://github.com/LuwuDynamics/xgoduck_rl) | Nhánh RL từ microduck_rl. Có **MJCF/URDF XGO-Duck** (`src/mjlab_microduck/robot/xgoduck/`), khối lượng xuất từ SolidWorks, mô hình BAM `1910_m6.json` (§1.4, §2.2, §5.1) | Đã đọc README và các file mô hình |
 | [Arduino UNO Q — tài liệu chính hãng](https://docs.arduino.cc/hardware/uno-q/) | Phần cứng điều khiển của XGO | Link xác nhận tồn tại |
 
 **Tham khảo thêm**
@@ -102,7 +102,7 @@ Phase 1 (CAD) → Phase 2 (tải) ─ trượt → đổi ứng viên / sửa h�
 | Nguồn | Dùng cho |
 |---|---|
 | [MuJoCo](https://github.com/google-deepmind/mujoco) · [tài liệu](https://mujoco.readthedocs.io/en/stable/overview.html) | Mô phỏng (Phase 2, 5) |
-| [ros/solidworks_urdf_exporter](https://github.com/ros/solidworks_urdf_exporter) | SolidWorks → URDF (§1.3) |
+| [ros/solidworks_urdf_exporter](https://github.com/ros/solidworks_urdf_exporter) | SolidWorks → URDF (§1.4) |
 | [Rhoban/bam](https://github.com/Rhoban/bam) | Better Actuator Models: System ID servo (§2.4, §4.5.3) |
 | [mujocolab/mjlab](https://github.com/mujocolab/mjlab) | Framework train RL mà microduck_rl và xgoduck_rl dùng (Phase 5) |
 

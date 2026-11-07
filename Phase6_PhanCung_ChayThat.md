@@ -23,7 +23,7 @@
 | **TỔNG (mới gồm mục 1–6)** | | | **15 khớp** | | **$1.114.000\text{ ₫}$** | ⚠️ Chưa gồm mục 7–8. HD1910 là servo bus đã có sẵn driver, encoder và bộ điều khiển, nên chỉ so được giá khi cộng đủ mục 7–8. Giá HD1910 về VN phải tra lại |
 
 ## 6.2. Gia công & lắp ráp
-1. In các chi tiết theo CAD đã chốt (Phase 1). Cân lại và so với khối lượng đã đưa vào MJCF (§1.3). Lệch nhiều thì cập nhật MJCF rồi chạy lại Phase 2.
+1. In các chi tiết theo CAD đã chốt (Phase 1). Cân lại và so với khối lượng đã đưa vào MJCF (§1.4). Lệch nhiều thì cập nhật MJCF rồi chạy lại Phase 2.
 2. Độ đủ 15 servo theo SOP của phương án đã chọn (§4.2 / §4.3 / §4.4). Mỗi con qua bàn thử §4.5 trước khi lắp.
 3. Khi lắp horn, căn **tư thế đứng nằm giữa hành trình chiết áp** (Bước A2 ở §4.2).
 4. Đi dây theo chi (Bước A4 / §4.3.5). Dây nguồn công suất chọn tiết diện theo dòng stall đo được.

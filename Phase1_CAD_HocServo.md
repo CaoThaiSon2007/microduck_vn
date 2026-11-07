@@ -14,7 +14,7 @@
 |---|---|---|
 | **Chỉ có file STL** của các chi tiết in (`structure/*.stl`, 30 file, ví dụ `2x_shank.stl`, `2x_hip_rol_shell.stl`) | [xgoduck_hardware/structure](https://github.com/LuwuDynamics/xgoduck_hardware/tree/master/structure) | Không sửa hốc theo tham số được. Phải **vẽ lại** các chi tiết chứa servo trong CAD, dùng STL làm khuôn tham chiếu (import mesh, đo, dựng lại) |
 | Bản lắp SolidWorks gốc (`XGODUCK_roller.SLDASM`) | Chỉ được nhắc tên trong `mass_properties_sw.json`, **không công bố** | Không có CAD tham số gốc |
-| **MJCF + URDF của XGO-Duck**, khối lượng và quán tính từng link xuất từ SolidWorks (tổng 0.874 kg cho bản roller) | [xgoduck_rl/src/mjlab_microduck/robot/xgoduck](https://github.com/LuwuDynamics/xgoduck_rl/tree/main/src/mjlab_microduck/robot/xgoduck) (`robot_walk.xml`, `robot_allcollisions.xml`, `urdf/XGODUCK.urdf`) | **Dùng làm MJCF baseline HD1910 cho Phase 2 ngay**, không cần chờ vẽ lại CAD. Biến thể cho ứng viên khác: sửa khối lượng, CoM, quán tính của các link chứa servo (§1.3) |
+| **MJCF + URDF của XGO-Duck**, khối lượng và quán tính từng link xuất từ SolidWorks (tổng 0.874 kg cho bản roller) | [xgoduck_rl/src/mjlab_microduck/robot/xgoduck](https://github.com/LuwuDynamics/xgoduck_rl/tree/main/src/mjlab_microduck/robot/xgoduck) (`robot_walk.xml`, `robot_allcollisions.xml`, `urdf/XGODUCK.urdf`) | **Dùng làm MJCF baseline HD1910 cho Phase 2 ngay**, không cần chờ vẽ lại CAD. Biến thể cho ứng viên khác: sửa khối lượng, CoM, quán tính của các link chứa servo (§1.4) |
 | Giấy phép mô hình 3D | [UPSTREAM.md](https://github.com/LuwuDynamics/xgoduck_hardware/blob/master/UPSTREAM.md): microduck_rl ghi giấy phép **phi thương mại, share-alike** cho mô hình 3D | Chi tiết vẽ lại dựa trên STL của XGO/Microduck vẫn phải tuân theo giấy phép đó |
 
 ## 1.1. Ứng viên servo
@@ -27,7 +27,42 @@
 
 Có thêm ứng viên khác thì bổ sung vào bảng này. Kích thước của mỗi ứng viên phải **đo bằng thước kẹp trên con thật**, không lấy từ ảnh trên trang bán hàng.
 
-## 1.2. Sửa hốc servo
+## 1.2. Chi tiết tiêu chuẩn: thiết kế bắt đầu từ linh kiện mua được ở VN
+
+> ⚠️ **Vòng bi của XGO-Duck tương đối khó tìm ở VN.** Phải kiểm tra nguồn mua trước khi vẽ lại CAD.
+
+**Nguyên tắc thiết kế hệ cơ điện tử:** thiết kế phải xuất phát từ **chi tiết tiêu chuẩn**, tức các chi tiết mà nhóm không tự gia công được (vòng bi, bu lông, đai ốc, vít tự ren, chốt, trục, lò xo, đầu nối...). Kích thước của chúng là cố định, nên chi tiết tự làm (in 3D, CNC) phải vẽ quanh chúng. Làm ngược lại sẽ dẫn đến một bản CAD đẹp nhưng không lắp được vì không mua được linh kiện.
+
+Hệ quả cho dự án: XGO-Duck chọn linh kiện theo thị trường Trung Quốc. Khi vẽ lại CAD, **phải chốt danh sách chi tiết tiêu chuẩn mua được ở VN trước**, sau đó mới vẽ ổ đỡ, lỗ bắt vít và hốc servo theo danh sách đó.
+
+### 1.2.1. Chi tiết tiêu chuẩn của XGO-Duck
+
+Theo [BOM của xgoduck_hardware](https://github.com/LuwuDynamics/xgoduck_hardware/blob/master/docs/BOM.md) (đọc 07/11/2026):
+
+| Chi tiết | SL | Ghi chú |
+|---|---|---|
+| Vòng bi 10 × 15 × 3 mm | 10 (2 + 8 cho bản roller) | BOM **không ghi mã series**, chưa rõ nắp che/phớt/vành chặn |
+| Vòng bi 16 × 22 × 4 mm | 11 | Như trên |
+| Vít tự ren M2 × 6, đầu bằng (côn chìm), đuôi bằng | 204 (200 + 4 cho roller) | Vít bắt vào nhựa in |
+| Vít tự ren M2.3 × 8, đầu tròn mặt phẳng, đuôi bằng | 6 | BOM ghi rõ không thay bằng vít M2.5 × 6 của trục servo |
+| Ốc máy M3 × 16, đầu tròn | 4 | Ren máy |
+| Dây servo AMP2.0-3P, bước 2.0 mm, 150 mm | 15 | Đầu cắm theo servo HD1910; đổi servo thì đầu cắm cũng đổi |
+
+Vì BOM không ghi mã series, phải tìm vòng bi theo kích thước $d \times D \times B$ và mua mẫu về đo lại. Không giả định một mã vòng bi nào khớp chỉ vì trùng kích thước.
+
+Phương án độ MG92B (§4.1.2) thêm các chi tiết tiêu chuẩn riêng: vòng bi MR63ZZ, chốt thép $\Phi 3$ h6 hoặc ốc vai. Các chi tiết này cũng phải qua bước kiểm tra nguồn mua bên dưới.
+
+### 1.2.2. Quy trình
+1. **Khảo sát nguồn VN cho từng chi tiết** trong bảng §1.2.1 và các chi tiết của phương án độ. Ghi vào BOM ([Phase 6 §6.1](Phase6_PhanCung_ChayThat.md)): nơi bán, mã, kích thước, đơn giá, ngày tra, link.
+2. **Mua mẫu và đo bằng thước kẹp** trước khi vẽ. Với vòng bi, đo $d$, $D$, $B$ và ghi loại nắp che (ZZ, 2RS, hở), có vành chặn hay không.
+3. **Không mua được thì đổi sang kích thước có sẵn ở VN**, rồi sửa ổ đỡ trong CAD:
+   * Tham số hóa ổ đỡ bằng biến, ví dụ `brg_d`, `brg_D`, `brg_B`, giống cách tham số hóa hốc servo ở §1.3.
+   * Đổi vòng bi chỉ được làm thay đổi ổ đỡ, **không được dời trục khớp** (§1.3, bước 3).
+   * Kiểm tra lại không gian quanh ổ (thành ổ in 3D đủ dày) và tải của khớp đó.
+4. **Ốc vít:** ưu tiên cỡ phổ biến ở VN. Không thay vít tự ren bằng ốc máy hoặc ngược lại mà không sửa lỗ trong CAD. Nếu đổi sang ốc máy thì phải vẽ thêm chỗ cho đai ốc hoặc insert ren cấy nóng.
+5. **Chốt danh sách chi tiết tiêu chuẩn** (kích thước đo thật) trước khi vẽ hốc servo ở §1.3.
+
+## 1.3. Sửa hốc servo
 1. **Đo servo thật:**
    * Kích thước thân, vị trí và đường kính lỗ tai bắt vít.
    * **Vị trí trục ra so với thân.** Đây là kích thước quan trọng nhất.
@@ -41,7 +76,7 @@ Có thêm ứng viên khác thì bổ sung vào bảng này. Kích thước củ
    * Nắp đáy in 3D. Với phương án B, nắp này phải chứa được bo zin (§4.3).
    * Đường luồn bó dây qua U-bracket và khớp háng (§4.3.5).
 
-## 1.3. Khối lượng & quán tính → MJCF
+## 1.4. Khối lượng & quán tính → MJCF
 
 **Cách nhanh (làm trước):** lấy MJCF của XGO-Duck trong `xgoduck_rl` làm gốc.
 * `robot_walk.xml` có free joint `trunk_base_freejoint` ở gốc cây, nên 6 DOF đầu là base, đúng như script §2.2 giả định.
@@ -54,7 +89,7 @@ Với mỗi ứng viên, tạo `duck_<servo>.xml` bằng cách sửa khối lư�
 * Cộng khối lượng ứng viên **cân thật**.
 * Cộng thay đổi của chi tiết in vẽ lại.
 
-**Cách đầy đủ (sau khi vẽ lại CAD ở §1.2):**
+**Cách đầy đủ (sau khi vẽ lại CAD ở §1.3):**
 * Mỗi link cần đủ khối lượng $m$, trọng tâm CoM và tensor quán tính $I$.
 * **Chi tiết in 3D:** CAD tính khối lượng như vật đặc, trong khi bản in thật có infill khoảng 15–30%. Cần in thử, cân từng chi tiết rồi ghi đè khối lượng trong CAD. Nếu chưa in được thì gán khối lượng riêng hiệu dụng theo infill và ghi chú là số ước lượng.
 * **Linh kiện nặng:** servo, pin, bo mạch, ốc và dây phải có trong CAD, ít nhất dưới dạng khối đặc trưng (dummy). Khối lượng gán vào là **khối lượng cân thật**.
@@ -63,7 +98,8 @@ Với mỗi ứng viên, tạo `duck_<servo>.xml` bằng cách sửa khối lư�
   * Khối lượng và quán tính lấy theo cách XGO đã làm trong `mass_properties_sw.json`: dùng Mass Properties của SolidWorks cho từng link, có override khối lượng, quán tính tính quanh CoM theo trục link.
 * Giữ site `left_foot` / `right_foot` như MJCF của XGO, đặt tại **tâm đế bàn chân, sát mặt đất**. Script §2.2 tính phản lực đất tại hai điểm này. Kiểm tra lại vị trí site trên mesh đế chân.
 
-## 1.4. Điều kiện xong Phase 1
+## 1.5. Điều kiện xong Phase 1
+- [ ] Đã có danh sách chi tiết tiêu chuẩn (vòng bi, ốc vít, chốt) **mua được ở VN**, kèm kích thước đo trên mẫu thật (§1.2).
 - [ ] Đã có MJCF baseline HD1910 (từ `xgoduck_rl`) và mở được trong MuJoCo viewer.
 - [ ] Mỗi ứng viên có 1 biến thể `duck_<servo>.xml`, khối lượng servo đã thay bằng số cân thật.
 - [ ] Nếu đi tiếp sang chế tạo: các chi tiết chứa servo đã vẽ lại thành CAD tham số. Trục khớp trùng XGO-Duck và không va chạm trong dải khớp.

@@ -8,11 +8,12 @@
 > 🔴 nặng: làm sai là hỏng servo hoặc robot không chạy, thường phải làm lại cả 15 con. 🟠 trung bình: không hỏng ngay nhưng tốn công debug. 🟡 số liệu cần kiểm chứng trước khi dùng.
 
 ## Phase 1 — CAD
+- [ ] 🔴 **Chốt chi tiết tiêu chuẩn mua được ở VN trước khi vẽ.** Vòng bi XGO (10×15×3, 16×22×4 mm) khó tìm ở VN, BOM không ghi mã series. Không mua được thì đổi kích thước vòng bi và sửa ổ đỡ, giữ nguyên trục khớp. (§1.2)
 - [ ] 🔴 **Kiểm tra số răng spline horn** của ứng viên trước khi mua horn hoặc vẽ CAD. (§4.1.2)
-- [ ] 🔴 **Giữ nguyên trục khớp của XGO-Duck** khi sửa hốc. Đổi trục khớp thì kết quả Phase 2 giữa các ứng viên không còn so được. (§1.2)
-- [ ] 🟠 So `range` khớp trong MJCF với hành trình chốt chặn của servo. Đầu gối và hông pitch thường cần gập sâu. (§1.2, Bước A2)
-- [ ] 🟠 *(MG92B)* Chừa chỗ cho U-bracket, vòng bi, chốt trục giả, nắp đáy (chứa bo zin nếu chọn phương án B) và đường luồn bó dây. (§1.2, §4.1.2, §4.3.5)
-- [ ] 🟡 Khối lượng chi tiết in 3D phải lấy từ **cân bản in thật**, không dùng số CAD tự tính theo vật đặc. (§1.3)
+- [ ] 🔴 **Giữ nguyên trục khớp của XGO-Duck** khi sửa hốc. Đổi trục khớp thì kết quả Phase 2 giữa các ứng viên không còn so được. (§1.3)
+- [ ] 🟠 So `range` khớp trong MJCF với hành trình chốt chặn của servo. Đầu gối và hông pitch thường cần gập sâu. (§1.3, Bước A2)
+- [ ] 🟠 *(MG92B)* Chừa chỗ cho U-bracket, vòng bi, chốt trục giả, nắp đáy (chứa bo zin nếu chọn phương án B) và đường luồn bó dây. (§1.3, §4.1.2, §4.3.5)
+- [ ] 🟡 Khối lượng chi tiết in 3D phải lấy từ **cân bản in thật**, không dùng số CAD tự tính theo vật đặc. (§1.4)
 - [ ] 🟡 Kích thước servo đo bằng thước kẹp trên con thật. (§1.1)
 - [ ] 🔴 Cơ khí XGO **chỉ có STL**. Phải vẽ lại các chi tiết chứa servo trước khi in cho ứng viên khác. Chi tiết vẽ lại vẫn chịu giấy phép phi thương mại, share-alike của mô hình 3D upstream. (§1.0)
 
