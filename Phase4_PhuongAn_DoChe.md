@@ -22,7 +22,7 @@
   * Ước lượng mô-men kẹt (stall) tỉ lệ tuyến tính theo điện áp hiệu dụng đặt lên motor:
     $$\tau_{\text{peak}} \approx 0.35 \times \frac{7.4}{6.0} \approx 0.43\text{ N}\cdot\text{m} \quad (\text{ở } 7.4\text{V};\ \approx 0.49\text{ N}\cdot\text{m ở } 8.4\text{V})$$
   * ⚠️ **Kết luận thẳng:** kể cả khi quá áp, MG92B vẫn **thấp hơn nhiều** so với HD1910 mà khung XGO được thiết kế cho. Kết luận đạt hay không phải theo **Phase 2**:
-    * Nếu $\tau_{\text{peak}}$, $\tau_{\text{RMS}}$ cần thiết nằm dưới ngưỡng tính theo torque **đo thật** (§4.5.3, §2.4): khai báo giới hạn đó vào MuJoCo rồi train policy.
+    * Nếu $\tau_{\text{peak}}$, $\tau_{\text{RMS}}$ cần thiết nằm dưới ngưỡng tính theo torque **đo thật** (§4.5.3, §2.5): khai báo giới hạn đó vào MuJoCo rồi train policy.
     * Nếu **tải tĩnh** (§2.2) đã vượt khả năng servo: train lại policy **không cứu được**, vì robot không đứng nổi. Khi đó phải đổi servo cho các khớp đó hoặc sửa hình học chân.
 * **Bẫy "giới hạn duty" (lỗi đã mắc trong bản trước):**
   * Giới hạn duty cố định $80\%$ **không phải giới hạn dòng**. Với pin $7.4\text{V}$: $80\% \to \approx 5.9\text{V}$ hiệu dụng ≈ áp zin, gần như không tăng lực. Với pin đầy $8.4\text{V}$: $80\% \to \approx 6.7\text{V}$ **liên tục** → quá áp thường trực, nhiệt $\propto V^2$ gấp $\approx 2$ lần so với $6\text{V}$.

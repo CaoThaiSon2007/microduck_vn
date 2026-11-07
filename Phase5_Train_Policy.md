@@ -22,7 +22,7 @@
   * Với HD1910, file `1910_m6.json` gồm `kt`, `R`, `armature`, các hệ số ma sát (Stribeck, phụ thuộc tải), `command_delay`.
   * Thông số chạy được khai báo trong `xgoduck_constants.py`, ví dụ `kp_fw=5.0`.
   * Với servo độ: nhận dạng bằng BAM (§4.5.3) để ra file JSON tương đương, ví dụ `mg92b_<phương án>.json`. Sau đó thay vào cấu hình actuator.
-* **Giới hạn mô-men:** lấy theo số **đo được** (§2.4, §4.5.3), không lấy theo datasheet. Có thêm **giới hạn mô-men phụ thuộc vận tốc** do back-EMF. BAM mô hình hóa phần này qua `kt`, `R` và áp nguồn.
+* **Giới hạn mô-men:** lấy theo số **đo được** (§2.5, §4.5.3), không lấy theo datasheet. Có thêm **giới hạn mô-men phụ thuộc vận tốc** do back-EMF. BAM mô hình hóa phần này qua `kt`, `R` và áp nguồn.
 * **Các thông số khớp:** `kp`, `kv`, `frictionloss`, `damping`, `armature` lấy theo System ID (§4.5.3).
 * **Chế độ cầu H:** brake hoặc coast phải giống phần cứng. Phương án B có thể chỉ có coast (§4.3.3).
 * **Phương án C:** mô hình hóa luôn vòng điều khiển của PIC đã đo (§4.4).

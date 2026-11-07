@@ -4,9 +4,9 @@
 
 ---
 
-> **Trạng thái:** quy trình và script đề xuất 05/11/2026, **chưa có kết quả tính nào**. Mọi số liệu phải sinh từ MJCF của dự án (Phase 1) và từ servo đo thật (§2.4).
+> **Trạng thái:** quy trình và script đề xuất 05/11/2026, **chưa có kết quả tính nào**. Mọi số liệu phải sinh từ MJCF của dự án (Phase 1) và từ servo đo thật (§2.5).
 > **Đầu vào:** `duck_<servo>.xml` từ Phase 1. Baseline HD1910 dùng thẳng `robot_walk.xml` của [xgoduck_rl](https://github.com/LuwuDynamics/xgoduck_rl/tree/main/src/mjlab_microduck/robot/xgoduck). Phải clone cả repo, vì MJCF tham chiếu mesh STL theo đường dẫn tương đối.
-> **Đầu ra:** bảng $\tau_{peak}$, $\tau_{RMS}$, $\omega_{max}$ cho từng khớp, từng ứng viên, kèm kết luận ứng viên nào đi tiếp sang [Phase 3](Phase3_PhanTich_IO.md).
+> **Đầu ra:** bảng $\tau_{peak}$, $\tau_{RMS}$, $\omega_{max}$ cho từng khớp, từng ứng viên, kèm kết luận ứng viên nào đi tiếp sang [Phase 3](Phase3_PhanTich_IO.md). Thêm bảng tải 6 thành phần tại từng khớp (§2.4) để kiểm tra bền chi tiết in ở Phase 1 §1.5.
 
 **Mục tiêu:** tính mô-men và tốc độ mà mỗi khớp **cần** khi robot đứng và đi, rồi so với khả năng **đo được** của servo.
 
@@ -74,7 +74,7 @@ python <đường dẫn repo>/scripts/dynamic_load.py scene_walk.xml --gait my_g
 * `--gait module:hàm`: hàm `q_ref(t, m)` trả về góc mục tiêu cho mọi actuator. Bỏ trống thì script chỉ giữ tư thế 0 để kiểm tra chạy được. Robot không có bộ cân bằng nên sẽ chao, **số in ra không phải tải thật**.
 * `--force-limit`: mặc định nới `forcerange` lên ±100 N·m. Script cảnh báo nếu actuator vẫn chạm giới hạn.
 * `--kp`: đặt kp cứng cho actuator `<position>`. MJCF của XGO để kp = 0.84, quá mềm nên không bám được quỹ đạo.
-* Log lưu ra `load_log.npz` (`tau`, `w`, `names`, `dt`) để vẽ đồ thị $	au$–$\omega$.
+* Log lưu ra `load_log.npz` (`tau`, `w`, `names`, `dt`) để vẽ đồ thị $\tau$–$\omega$.
 
 **Kịch bản cần chạy:**
 * Đứng yên.
@@ -96,14 +96,55 @@ python <đường dẫn repo>/scripts/dynamic_load.py scene_walk.xml --gait my_g
 | $\omega_{max}$ | $\omega_0$ (không tải) đo thật | Không đạt tốc độ bước |
 | Đám điểm $(\omega, \tau)$ | Đường đặc tính $\tau = \tau_{stall}(1 - \omega/\omega_0)$ ở **áp pin khi có tải** | Điểm nào nằm trên đường thì servo không đáp ứng được |
 
-**Ngưỡng chấp nhận** (dựa trên kinh nghiệm thực hành, chưa phải số đã kiểm chứng; dự án tự chốt). Đối chiếu với datasheet HD1910: rated torque bằng khoảng 25% stall (3.0 / 12 kgf·cm ở 6V), khớp với ngưỡng $	au_{RMS}$ dưới đây. Ứng viên có datasheet ghi rated torque thì so $	au_{RMS}$ trực tiếp với rated torque.
+**Ngưỡng chấp nhận** (dựa trên kinh nghiệm thực hành, chưa phải số đã kiểm chứng; dự án tự chốt). Đối chiếu với datasheet HD1910: rated torque bằng khoảng 25% stall (3.0 / 12 kgf·cm ở 6V), khớp với ngưỡng $\tau_{RMS}$ dưới đây. Ứng viên có datasheet ghi rated torque thì so $\tau_{RMS}$ trực tiếp với rated torque.
 * $\tau_{peak} \lesssim 50\text{–}60\%\ \tau_{stall}$
 * $\tau_{RMS} \lesssim 25\text{–}30\%\ \tau_{stall}$
 * Mọi điểm $(\omega, \tau)$ nằm dưới đường đặc tính.
 
 Phải chừa biên vì hai lý do. Thứ nhất, thông số stall trên trang bán hàng thường ghi cao hơn thực tế. Thứ hai, áp pin sụt khi 15 servo cùng kéo tải.
 
-## 2.4. Đo servo thật để chốt
+## 2.4. Tải lên chi tiết cơ khí (script `joint_wrench.py`)
+
+§2.2 và §2.3 chỉ cho **mô-men quanh trục khớp**, tức tải của servo. Chi tiết in 3D, ổ đỡ và vòng bi còn chịu các thành phần khác truyền qua khớp: lực dọc trục, lực hướng kính và **mô-men uốn**. Mô-men uốn thường là thứ làm gãy chi tiết in. Mục này lấy đủ 6 thành phần lực/mô-men tại từng khớp để làm đầu vào cho kiểm tra bền ở [Phase 1 §1.5](Phase1_CAD_HocServo.md).
+
+**Nguyên lý.** Sau `mj_forward`, gọi thêm `mj_rnePostConstraint`. MuJoCo trả về `cfrc_int[b]`: lực và mô-men mà body cha tác dụng lên body $b$ (gồm cả nhánh phía dưới $b$), lấy quanh trọng tâm cây `subtree_com[root]`. Script chuyển mô-men về tâm khớp $p$ (`xanchor`):
+
+$$M_p = M_c + (c - p) \times F$$
+
+rồi chiếu lên hệ trục của body con (frame link trong MJCF/URDF), và tách theo trục khớp $\hat a$:
+* $M_{axis} = M_p \cdot \hat a$: phần servo gánh.
+* $M_{bend} = \lVert M_p - M_{axis}\hat a \rVert$: phần ổ đỡ, vòng bi và khung gánh.
+* $F_{axial} = F \cdot \hat a$, $F_{radial} = \lVert F - F_{axial}\hat a \rVert$: tải vòng bi.
+
+**Script:** [`scripts/joint_wrench.py`](scripts/joint_wrench.py).
+
+```
+python <đường dẫn repo>/scripts/joint_wrench.py scene_walk.xml --gait my_gait:q_ref --kp 20 --check
+python <đường dẫn repo>/scripts/joint_wrench.py scene_walk.xml --kp 20 --drop 0.05   # thả rơi 5 cm
+python <đường dẫn repo>/scripts/joint_wrench.py scene_walk.xml --kp 20 --push 1.0    # đẩy ngang 1 m/s
+```
+
+* `--gait`, `--kp`, `--force-limit`, `--settle`, `--run`: giống `dynamic_load.py` (§2.3).
+* `--drop H`: sau thời gian `--settle`, nâng base thêm $H$ [m] rồi thả. Đây là ca va đập.
+* `--push V`: sau `--settle`, đặt vận tốc ngang $V$ [m/s] cho base. Đẩy đủ mạnh thì robot ngã, đây là ca té ngã.
+* `--check`: so $M_{axis}$ với mô-men khớp tính theo cách độc lập (actuator + passive + frictionloss/limit − armature·$\ddot q$). Sai lệch lớn nghĩa là quy ước tính bị sai.
+* In ra cho mỗi khớp: $\lvert F\rvert_{max}$, $F_{axial}$, $F_{radial}$, $M_{axis}$, $M_{bend}$ đỉnh, kèm **đủ 6 thành phần $[F_x\,F_y\,F_z\,M_x\,M_y\,M_z]$ tại thời điểm $M_{bend}$ đỉnh**. FEA phải dùng bộ 6 số xảy ra cùng lúc này, không ghép các đỉnh riêng lẻ của từng thành phần (ghép như vậy thường quá bảo thủ và không ứng với trạng thái nào có thật).
+* Log đầy đủ theo thời gian lưu ra `wrench_log.npz` (`wrench`, `decomp`, `actuator_force`, `names`, `dt`), dùng để chọn thêm thời điểm khác cho FEA, ví dụ lúc $F_{radial}$ đỉnh.
+
+**Đã kiểm chứng (07/11/2026):**
+* Con lắc 1 khớp, 1 kg, cánh tay đòn 0.2 m, giữ nằm ngang: script cho $F_z = +9.81$ N (cha đỡ con hướng lên) và $M = -1.962$ N·m, bằng đúng mô-men actuator. Quy ước dấu và điểm đặt đúng.
+* `scene_walk.xml` của xgoduck_rl, `--kp 20`, cả 3 ca (giữ tư thế, `--drop 0.05`, `--push 1.0`): `--check` cho sai lệch $\le 2.3\times10^{-5}$ N·m. Các lần chạy này không có `--gait` nên robot không giữ được thăng bằng, **số in ra không phải kết quả tải**.
+
+**Ca tải cần chạy:**
+* Các tư thế của §2.1 và các kịch bản của §2.3.
+* **Ca té ngã và va đập** (`--drop`, `--push`). Với chi tiết in, đây thường là ca tải lớn nhất, lớn hơn nhiều so với lúc đi.
+
+**Lưu ý khi đọc kết quả:**
+1. Lực va chạm trong MuJoCo phụ thuộc mạnh vào `solref`/`solimp` của tiếp xúc và vật liệu đế chân. Số ở ca té ngã và va đập **chỉ dùng để so tương đối** giữa các thiết kế (§1.5, bước 3), không coi là tải tuyệt đối.
+2. Hệ trục của kết quả là frame link trong MJCF. Trước khi đặt tải trong SolidWorks, phải xác định frame này trên chi tiết CAD. Nếu xuất MJCF bằng `sw_urdf_exporter` (§1.4) thì frame link trùng hệ tọa độ đặt trong SolidWorks.
+3. Mỗi khớp cho tải tại **một mặt cắt** (giữa link cha và link con). Một chi tiết in thường nối hai khớp, nên lấy tải ở cả hai khớp và kiểm tra cả hai đầu.
+
+## 2.5. Đo servo thật để chốt
 Mua 1–2 con mỗi ứng viên về đo, dùng chung bàn thử với §4.5.3:
 * **$\tau_{stall}$:** gắn tay đòn dài $L$, treo tải $m$, có $\tau = mgL$. Tăng tải dần cho tới khi servo không giữ được nữa. Ghi lại cả dòng điện.
 * **Đường $\tau$–$\omega$:** đo thời gian servo kéo các mức tải khác nhau qua một góc cố định, suy ra $\omega$. Đo ở **áp pin thật khi có tải**.
@@ -113,9 +154,10 @@ Mua 1–2 con mỗi ứng viên về đo, dùng chung bàn thử với §4.5.3:
 * Chỉ đổi servo mạnh hơn cho riêng các khớp đó.
 * Sửa hình học chân để giảm cánh tay đòn trọng tâm, rồi chạy lại vòng lặp.
 
-## 2.5. Kết luận Phase 2
+## 2.6. Kết luận Phase 2
 - [ ] Đã chạy đủ các kịch bản ở §2.3 cho từng ứng viên.
-- [ ] Ứng viên đạt cả 3 tiêu chí ở §2.3 với **thông số đo thật** (§2.4) thì đi tiếp sang [Phase 3](Phase3_PhanTich_IO.md).
+- [ ] Đã xuất tải 6 thành phần tại các khớp (§2.4), gồm cả ca té ngã và va đập, để kiểm tra bền chi tiết in ở §1.5.
+- [ ] Ứng viên đạt cả 3 tiêu chí ở §2.3 với **thông số đo thật** (§2.5) thì đi tiếp sang [Phase 3](Phase3_PhanTich_IO.md).
 - [ ] Ứng viên trượt: ghi lại khớp nào trượt, trượt tiêu chí nào. Sau đó đổi servo riêng cho khớp đó hoặc sửa hình học chân rồi quay lại [Phase 1](Phase1_CAD_HocServo.md).
 - [ ] Nếu **tải tĩnh** (§2.2) đã vượt khả năng servo thì loại luôn. Phần độ chế ở Phase 4 không tăng được mô-men đủ để bù.
 

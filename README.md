@@ -103,7 +103,7 @@ Phase 1 (CAD) → Phase 2 (tải) ─ trượt → đổi ứng viên / sửa h�
 |---|---|
 | [MuJoCo](https://github.com/google-deepmind/mujoco) · [tài liệu](https://mujoco.readthedocs.io/en/stable/overview.html) | Mô phỏng (Phase 2, 5) |
 | [ros/solidworks_urdf_exporter](https://github.com/ros/solidworks_urdf_exporter) | SolidWorks → URDF (§1.4) |
-| [Rhoban/bam](https://github.com/Rhoban/bam) | Better Actuator Models: System ID servo (§2.4, §4.5.3) |
+| [Rhoban/bam](https://github.com/Rhoban/bam) | Better Actuator Models: System ID servo (§2.5, §4.5.3) |
 | [mujocolab/mjlab](https://github.com/mujocolab/mjlab) | Framework train RL mà microduck_rl và xgoduck_rl dùng (Phase 5) |
 
 Mọi link ở 6.2 đều mới xác nhận tồn tại.
@@ -145,7 +145,7 @@ Phase4_PhuongAn_DoChe.md       Phase 4: phương án độ chế A / A′ / B / 
 Phase5_Train_Policy.md         Phase 5: train policy (microduck_rl / xgoduck_rl, BAM)
 Phase6_PhanCung_ChayThat.md    Phase 6: BOM, gia công, chạy thật
 CHECKLIST.md                   Lỗi cần tránh, chia theo phase
-scripts/                       static_torque.py, dynamic_load.py (xem scripts/README.md)
+scripts/                       static_torque.py, dynamic_load.py, joint_wrench.py (xem scripts/README.md)
 LICENSE                        CC BY-NC-SA 4.0
 ```
 

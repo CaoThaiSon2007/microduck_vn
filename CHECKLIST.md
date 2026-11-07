@@ -15,15 +15,20 @@
 - [ ] 🟠 *(MG92B)* Chừa chỗ cho U-bracket, vòng bi, chốt trục giả, nắp đáy (chứa bo zin nếu chọn phương án B) và đường luồn bó dây. (§1.3, §4.1.2, §4.3.5)
 - [ ] 🟡 Khối lượng chi tiết in 3D phải lấy từ **cân bản in thật**, không dùng số CAD tự tính theo vật đặc. (§1.4)
 - [ ] 🟡 Kích thước servo đo bằng thước kẹp trên con thật. (§1.1)
+- [ ] 🔴 **Chi tiết in sửa nhiều phải kiểm tra bền** bằng FEA so với chi tiết gốc XGO cùng tải, hoặc thử tải bản in thật. Kiểm cả độ cứng (độ võng quy về khớp nhỏ so với backlash servo), không chỉ độ bền. (§1.5)
+- [ ] 🟠 FEA coi chi tiết là khối đặc, bản in có infill và yếu ở phương Z (giữa các lớp). Không coi ứng suất FEA là độ bền tuyệt đối; dùng để so sánh và tìm chỗ ứng suất tập trung. Số liệu vật liệu lấy từ datasheet đúng hãng nhựa sẽ in. (§1.5)
+- [ ] 🟠 Thử tải bản in thật phải in **đúng thông số in sẽ dùng** (nhựa, infill, số vách, hướng in). Kiểm thêm lỗ vít tự ren tuột ren và ổ vòng bi lỏng do creep. (§1.5)
 - [ ] 🔴 Cơ khí XGO **chỉ có STL**. Phải vẽ lại các chi tiết chứa servo trước khi in cho ứng viên khác. Chi tiết vẽ lại vẫn chịu giấy phép phi thương mại, share-alike của mô hình 3D upstream. (§1.0)
 
 ## Phase 2 — Mô phỏng tải
-- [ ] 🔴 **Chạy Phase 2 trước khi mua đủ 15 servo.** Nếu tải tĩnh đã vượt khả năng servo thì phải đổi servo, train lại policy không cứu được. (§2.5, §4.1.1)
+- [ ] 🔴 **Chạy Phase 2 trước khi mua đủ 15 servo.** Nếu tải tĩnh đã vượt khả năng servo thì phải đổi servo, train lại policy không cứu được. (§2.6, §4.1.1)
 - [ ] 🔴 MJCF của XGO đặt `forcerange` ±1.04 N·m. **Nới giới hạn này** khi tính tải động, nếu không mô-men bị cắt và nhìn như "đủ". (§2.3)
 - [ ] 🟠 Chạy `static_torque.py` với `--foot-half` (kích thước đế chân đo trên CAD) để kiểm tra CoP. Tư thế có CoP ngoài đế chân thì loại. (§2.2)
 - [ ] 🟠 Đứng 2 chân thì kiểm tra chéo bằng sim có tiếp xúc, vì nghiệm min-norm chưa chắc khớp thực tế. (§2.2)
-- [ ] 🟡 τ_stall và ω₀ đem so phải là **số đo trên bàn thử**, đo ở áp pin thật khi có tải, không lấy từ trang bán hàng. (§2.4)
+- [ ] 🟡 τ_stall và ω₀ đem so phải là **số đo trên bàn thử**, đo ở áp pin thật khi có tải, không lấy từ trang bán hàng. (§2.5)
 - [ ] 🟡 Ngưỡng $\tau_{peak}$/$\tau_{RMS}$ theo % stall là kinh nghiệm thực hành. Dự án phải tự chốt. (§2.3)
+- [ ] 🟠 Tải cho FEA lấy **bộ 6 thành phần xảy ra cùng lúc** (`joint_wrench.py` in sẵn), không ghép các đỉnh riêng lẻ. Phải chạy cả ca té ngã và va đập (`--drop`, `--push`). (§2.4)
+- [ ] 🟡 Lực va chạm trong MuJoCo phụ thuộc `solref`/`solimp`. Tải ca té ngã/va đập chỉ dùng để so tương đối giữa thiết kế, không phải tải tuyệt đối. (§2.4)
 
 ## Phase 3 — Phân tích I/O
 - [ ] 🟠 Xác định rõ policy cần gì (R1–R7) trước khi chọn phương án. Phương án C không chỉnh được PD. (§3.1, §3.4)

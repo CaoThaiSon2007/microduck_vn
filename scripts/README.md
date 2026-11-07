@@ -6,6 +6,7 @@ Script tính tải servo cho [Phase 2](../Phase2_MoPhong_TaiServo.md).
 |---|---|---|
 | `static_torque.py` | Mô-men tĩnh từng khớp ở một tư thế, kiểm tra CoP và cân bằng lực | §2.2 |
 | `dynamic_load.py` | Chạy quỹ đạo trong MuJoCo, log $\tau(t)$, $\omega(t)$, in $\tau_{peak}$, $\tau_{RMS}$, $\omega_{max}$ | §2.3 |
+| `joint_wrench.py` | Lực và mô-men 6 thành phần truyền qua từng khớp (lực dọc trục, hướng kính, mô-men uốn), có ca thả rơi `--drop` và đẩy ngã `--push`. Đầu vào cho FEA chi tiết in | §2.4, §1.5 |
 
 ## Cài đặt
 ```
@@ -22,6 +23,7 @@ git clone https://github.com/LuwuDynamics/xgoduck_rl
 cd xgoduck_rl/src/mjlab_microduck/robot/xgoduck
 python <repo này>/scripts/static_torque.py robot_walk.xml --foot-half <HX> <HY>
 python <repo này>/scripts/dynamic_load.py scene_walk.xml --gait my_gait:q_ref --kp 20
+python <repo này>/scripts/joint_wrench.py scene_walk.xml --gait my_gait:q_ref --kp 20 --check
 ```
 * `robot_walk.xml`: robot không có sàn, dùng cho tính tĩnh.
 * `scene_walk.xml`: có sàn, dùng cho mô phỏng động.

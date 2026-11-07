@@ -98,11 +98,60 @@ Với mỗi ứng viên, tạo `duck_<servo>.xml` bằng cách sửa khối lư�
   * Khối lượng và quán tính lấy theo cách XGO đã làm trong `mass_properties_sw.json`: dùng Mass Properties của SolidWorks cho từng link, có override khối lượng, quán tính tính quanh CoM theo trục link.
 * Giữ site `left_foot` / `right_foot` như MJCF của XGO, đặt tại **tâm đế bàn chân, sát mặt đất**. Script §2.2 tính phản lực đất tại hai điểm này. Kiểm tra lại vị trí site trên mesh đế chân.
 
-## 1.5. Điều kiện xong Phase 1
+## 1.5. Kiểm tra bền chi tiết in 3D sau khi vẽ lại
+
+Chi tiết sửa ít (chỉ đổi kích thước hốc, thành hốc vẫn dày như cũ) thì thường không cần làm mục này. Chi tiết **sửa nhiều** thì phải kiểm tra lại độ bền và độ cứng. "Sửa nhiều" gồm: đổi hình dạng, mỏng thành, khoét thêm, dời lỗ vít hoặc ổ vòng bi, đổi đường truyền lực.
+
+```
+Tải 6 thành phần tại khớp (Phase 2 §2.4)
+      ↓
+FEA trong SolidWorks Simulation (bước 2)  ──→  so với chi tiết gốc XGO cùng tải (bước 3)
+      ↓                                              ↓ vượt bản gốc
+Thử tải bản in thật (bước 4)  ←─────────────────────┘
+      ↓
+Sửa CAD → cân lại → cập nhật MJCF (§1.4) → chạy lại Phase 2
+```
+
+1. **Lấy tải.** Chạy [`joint_wrench.py`](scripts/joint_wrench.py) theo [Phase 2 §2.4](Phase2_MoPhong_TaiServo.md) cho mọi ca: tư thế tĩnh, đi, **té ngã và va đập**. Với mỗi chi tiết, lấy bộ 6 thành phần tại các khớp mà chi tiết đó nối, ở các thời điểm đỉnh.
+
+2. **FEA trong SolidWorks Simulation**, phân tích tĩnh tuyến tính (Static study):
+   * **Gá cố định** (Fixture): mặt ổ vòng bi hoặc mặt bắt servo ở một đầu chi tiết.
+   * **Đặt tải** (Remote Load) tại tâm khớp ở đầu còn lại, theo hệ tọa độ trùng frame link của MJCF (§2.4, lưu ý 2).
+   * **Vật liệu:** lấy từ datasheet của **đúng loại nhựa và đúng hãng** sẽ in. Ưu tiên hãng công bố độ bền theo cả phương XY (trong lớp) và phương Z (giữa các lớp). Chi tiết in yếu nhất ở phương Z, nên vùng chịu kéo vuông góc với lớp in phải so với độ bền Z. Ghi rõ nguồn số liệu vật liệu.
+   * **Hai tiêu chí:**
+     * **Độ bền:** ứng suất lớn nhất so với độ bền vật liệu, có hệ số an toàn. Với chi tiết in, hệ số khoảng 2–4 là kinh nghiệm thực hành; **dự án tự chốt**.
+     * **Độ cứng:** độ võng hoặc góc xoay quy về khớp phải nhỏ so với backlash của servo (HD1910 $\le 0.5^\circ$). Khung mềm hơn servo thì policy, vốn train trên mô hình khung cứng, sẽ chạy sai.
+   * **Giới hạn:** FEA coi chi tiết là khối đặc, trong khi bản in có infill. Vì vậy FEA chỉ cho biết **vị trí** ứng suất tập trung và **so sánh** giữa các thiết kế. Không coi ứng suất tính ra là độ bền tuyệt đối của bản in.
+
+3. **So với chi tiết gốc của XGO.** Chi tiết gốc đã chạy được trên robot thật, nên đây là mốc tin cậy hơn số tuyệt đối:
+   * Import STL gốc vào SolidWorks và chuyển thành solid body.
+   * Chạy FEA với **cùng ca tải, cùng gá, cùng vật liệu** cho bản gốc và bản vẽ lại.
+   * Ứng suất lớn nhất và độ võng của bản mới **không vượt bản gốc** → đạt.
+   * Vượt bản gốc → sửa thiết kế, hoặc chứng minh bằng thử thật ở bước 4.
+   * Ca té ngã và va đập chỉ dùng được ở bước này (so tương đối), vì lực va chạm trong sim không đáng tin về giá trị tuyệt đối (§2.4, lưu ý 1).
+
+4. **Thử tải bản in thật:**
+   * In chi tiết với **đúng thông số in sẽ dùng thật**: cùng nhựa, infill, số vách (perimeter), nhiệt độ và hướng đặt khi in.
+   * Gá giống như trong FEA. Treo tạ hoặc kéo bằng cân móc theo hướng tải chính, tăng dần tới khi gãy.
+   * **Đạt** khi tải gãy $\ge$ tải lớn nhất từ bước 1 × hệ số an toàn. Ghi lại tải gãy, vị trí gãy, so với vị trí ứng suất tập trung trong FEA.
+   * Kiểm tra thêm những chỗ FEA không bắt được:
+     * Lỗ vít tự ren M2 (§1.2.1) bị tuột ren sau nhiều lần tháo lắp.
+     * Ổ vòng bi bị lỏng dần do nhựa biến dạng chậm (creep) dưới tải lâu dài.
+
+5. **Sửa thiết kế nếu không đạt**, theo thứ tự rẻ trước:
+   * Đổi hướng đặt khi in sao cho ứng suất chính chạy dọc lớp in.
+   * Tăng số vách ở vùng chịu lực. Vùng quanh ổ vòng bi và lỗ vít in đặc 100%.
+   * Thêm gân, bo góc tại vị trí ứng suất tập trung mà FEA chỉ ra.
+   * Đổi vật liệu in.
+
+   Sau mỗi lần sửa: cân lại bản in, cập nhật khối lượng trong MJCF (§1.4) rồi chạy lại Phase 2, vì khối lượng đổi thì tải đổi.
+
+## 1.6. Điều kiện xong Phase 1
 - [ ] Đã có danh sách chi tiết tiêu chuẩn (vòng bi, ốc vít, chốt) **mua được ở VN**, kèm kích thước đo trên mẫu thật (§1.2).
 - [ ] Đã có MJCF baseline HD1910 (từ `xgoduck_rl`) và mở được trong MuJoCo viewer.
 - [ ] Mỗi ứng viên có 1 biến thể `duck_<servo>.xml`, khối lượng servo đã thay bằng số cân thật.
 - [ ] Nếu đi tiếp sang chế tạo: các chi tiết chứa servo đã vẽ lại thành CAD tham số. Trục khớp trùng XGO-Duck và không va chạm trong dải khớp.
+- [ ] Chi tiết sửa nhiều đã qua kiểm tra bền (§1.5): ứng suất và độ võng không vượt bản gốc XGO, hoặc đã thử tải bản in thật đạt hệ số an toàn.
 
 ---
 
